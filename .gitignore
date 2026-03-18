@@ -1,0 +1,6 @@
+# Ignore everything
+*
+
+# Except the self-contained HTML schedule
+!index.html
+!.gitignore

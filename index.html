@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Highland Hawks - Chandler Rotary Schedule</title>
+<style>
+  :root {
+    --teal: #00736B;
+    --teal-dark: #005750;
+    --teal-light: #E0F2F1;
+    --cream: #FFF8E1;
+    --friday-green: #388E3C;
+    --friday-bg: #E8F5E9;
+    --seeded-bg: #E0F2F1;
+    --elite-bg: #FFF8E1;
+    --text: #111;
+    --text-light: #555;
+    --border: #ccc;
+    --radius: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f4f4f4;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+    color: white;
+    padding: 20px 16px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .header-content {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .header img {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+  }
+  .header h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .header .subtitle {
+    font-size: 0.75rem;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  /* Filter tabs */
+  .filter-bar {
+    display: flex;
+    gap: 0;
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 88px;
+    z-index: 99;
+    margin-top: -8px;
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+  .filter-btn {
+    flex: 1;
+    padding: 10px 6px;
+    border: none;
+    background: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+  }
+  .filter-btn.active {
+    color: var(--teal);
+    border-bottom-color: var(--teal);
+    background: var(--teal-light);
+  }
+  .filter-btn:not(.active):hover {
+    background: #f8f8f8;
+  }
+  .filter-btn .count {
+    display: inline-block;
+    background: var(--teal-light);
+    color: var(--teal);
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 0.6rem;
+    margin-left: 3px;
+  }
+  .filter-btn.active .count {
+    background: var(--teal);
+    color: white;
+  }
+
+  /* Session sections */
+  .session {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 12px;
+  }
+  .session-header {
+    color: white;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin: 8px 0;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .session-header.friday { background: var(--friday-green); }
+  .session-header.seeded { background: var(--teal); }
+  .session-header.elite { background: var(--teal-dark); }
+
+  /* Event cards */
+  .event-card {
+    background: white;
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-left: 4px solid var(--teal);
+    transition: transform 0.15s;
+  }
+  .event-card:active {
+    transform: scale(0.99);
+  }
+  .event-card.friday { border-left-color: var(--friday-green); background: var(--friday-bg); }
+  .event-card.seeded { border-left-color: var(--teal); }
+  .event-card.elite { border-left-color: var(--teal-dark); background: var(--cream); }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px 0;
+  }
+  .event-time {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--teal-dark);
+  }
+  .event-badge {
+    background: var(--teal);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .elite .event-badge { background: var(--teal-dark); }
+  .friday .event-badge { background: var(--friday-green); }
+
+  .event-name {
+    padding: 2px 12px 8px;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+
+  .athletes-list {
+    padding: 0 12px 10px;
+  }
+  .athlete-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .athlete-row:first-child {
+    border-top: 1px solid rgba(0,0,0,0.1);
+  }
+  .athlete-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .relay-name {
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--text-light);
+  }
+  .section-badge {
+    font-size: 0.65rem;
+    background: var(--teal-light);
+    color: var(--teal-dark);
+    padding: 2px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Search */
+  .search-wrap {
+    max-width: 600px;
+    margin: 12px auto 0;
+    padding: 0 12px;
+  }
+  .search-input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") no-repeat 12px center;
+  }
+  .search-input:focus {
+    border-color: var(--teal);
+  }
+
+  /* No results */
+  .no-results {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 0.7rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Past events */
+  .event-card.past {
+    opacity: 0.45;
+    border-left-color: #bbb !important;
+  }
+  .event-card.past .event-time { color: #999; }
+  .event-card.past .event-badge { background: #bbb; }
+
+  /* Current / up-next event */
+  .event-card.current {
+    border-left-width: 6px;
+    box-shadow: 0 0 0 2px var(--teal), 0 4px 12px rgba(0,115,107,0.25);
+    position: relative;
+  }
+  .event-card.current::before {
+    content: 'UP NOW';
+    position: absolute;
+    top: 8px;
+    right: 60px;
+    background: var(--teal);
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* Smooth scrolling */
+  html { scroll-behavior: smooth; }
+
+  /* Desktop tweaks */
+  @media (min-width: 640px) {
+    .header h1 { font-size: 1.5rem; }
+    .filter-btn { font-size: 0.8rem; padding: 12px 8px; }
+    .event-card { margin-bottom: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-content">
+    <img src="https://fabianp5060.github.io/nightmare-at-the-nest/assets/NightmareAtTheNestLogo.PNG" alt="Highland Logo" onerror="this.style.display='none'">
+    <div>
+      <h1>Highland Hawks Schedule</h1>
+      <div class="subtitle">86th Brooks Chandler Rotary  &middot;  March 20-21, 2026</div>
+    </div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <input type="text" class="search-input" placeholder="Search athlete or event..." id="searchInput">
+</div>
+
+<div class="filter-bar" id="filterBar">
+  <button class="filter-btn active" data-filter="all">All <span class="count">42</span></button>
+  <button class="filter-btn" data-filter="sprints">Sprints <span class="count">18</span></button>
+  <button class="filter-btn" data-filter="distance">Distance <span class="count">11</span></button>
+  <button class="filter-btn" data-filter="field">Field <span class="count">13</span></button>
+</div>
+
+<div class="session" id="cardContainer">
+  <div class="session-header friday" data-session="friday">Friday Relay Session - March 20</div>
+  
+      <div data-category="distance" class="event-card friday">
+        <div class="card-header">
+          <span class="event-time">8:20 PM</span>
+          <span class="event-badge">#62</span>
+        </div>
+        <div class="event-name">Girls Distance Medley</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 1 of 1</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card friday">
+        <div class="card-header">
+          <span class="event-time">8:20 PM</span>
+          <span class="event-badge">#63</span>
+        </div>
+        <div class="event-name">Boys Distance Medley</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 1 of 1</span></div>
+        </div>
+      </div>
+  <div class="session-header seeded" data-session="seeded">Saturday Seeded Session - March 21</div>
+  
+      <div data-category="field" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">8:30 AM</span>
+          <span class="event-badge">#125</span>
+        </div>
+        <div class="event-name">Girls Pole Vault</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Broadbent, Maryjane</span><span class="section-badge">Flt 1 of 1</span></div>
+<div class="athlete-row"><span class="athlete-name">Searle, Emilee</span><span class="section-badge">Flt 1 of 1</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">8:30 AM</span>
+          <span class="event-badge">#132</span>
+        </div>
+        <div class="event-name">Boys Discus Throw</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Beckford, Cecil</span><span class="section-badge">Flt 1 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">8:30 AM</span>
+          <span class="event-badge">#133</span>
+        </div>
+        <div class="event-name">Girls Shot Put</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Vea, Lolena</span><span class="section-badge">Flt 3 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">8:45 AM</span>
+          <span class="event-badge">#119</span>
+        </div>
+        <div class="event-name">Girls 3200 Meter Run</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Oplinger, Lily</span><span class="section-badge">Sec 2 of 2</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">8:45 AM</span>
+          <span class="event-badge">#120</span>
+        </div>
+        <div class="event-name">Boys 3200 Meter Run</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Nielsen, Ethan</span><span class="section-badge">Sec 1 of 2</span></div>
+<div class="athlete-row"><span class="athlete-name">Ostermeyer, Mason</span><span class="section-badge">Sec 1 of 2</span></div>
+<div class="athlete-row"><span class="athlete-name">Johnson, Lester (L.J.)</span><span class="section-badge">Sec 2 of 2</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">9:20 AM</span>
+          <span class="event-badge">#101</span>
+        </div>
+        <div class="event-name">Girls 4x800 Meter Relay</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 1 of 1</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">9:20 AM</span>
+          <span class="event-badge">#102</span>
+        </div>
+        <div class="event-name">Boys 4x800 Meter Relay</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 1 of 2</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">9:20 AM</span>
+          <span class="event-badge">#103</span>
+        </div>
+        <div class="event-name">Girls 100 Meter Hurdles</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Curry, Kacey</span><span class="section-badge">Sec 3 of 5</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">9:20 AM</span>
+          <span class="event-badge">#104</span>
+        </div>
+        <div class="event-name">Boys 110 Meter Hurdles</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Fortier, Gavin</span><span class="section-badge">Sec 4 of 5</span></div>
+<div class="athlete-row"><span class="athlete-name">Lueck, Colton</span><span class="section-badge">Sec 5 of 5</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">10:35 AM</span>
+          <span class="event-badge">#105</span>
+        </div>
+        <div class="event-name">Girls 100 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Davis, Lilee</span><span class="section-badge">Sec 1 of 7</span></div>
+<div class="athlete-row"><span class="athlete-name">Lowe, Addyson</span><span class="section-badge">Sec 3 of 7</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">10:35 AM</span>
+          <span class="event-badge">#106</span>
+        </div>
+        <div class="event-name">Boys 100 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Murray, Devin</span><span class="section-badge">Sec 3 of 7</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">11:05 AM</span>
+          <span class="event-badge">#108</span>
+        </div>
+        <div class="event-name">Boys 1600 Meter Run</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Davis, Samuel</span><span class="section-badge">Sec 3 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">11:30 AM</span>
+          <span class="event-badge">#123</span>
+        </div>
+        <div class="event-name">Girls High Jump</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Scott, Rylie</span><span class="section-badge">Flt 1 of 1</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">11:30 AM</span>
+          <span class="event-badge">#128</span>
+        </div>
+        <div class="event-name">Boys Long Jump</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Crockett, Isaiah</span><span class="section-badge">Flt 1 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">11:30 AM</span>
+          <span class="event-badge">#134</span>
+        </div>
+        <div class="event-name">Boys Shot Put</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Beckford, Cecil</span><span class="section-badge">Flt 3 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">12:00 PM</span>
+          <span class="event-badge">#109</span>
+        </div>
+        <div class="event-name">Girls 4x100 Meter Relay</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 2 of 2</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">12:00 PM</span>
+          <span class="event-badge">#110</span>
+        </div>
+        <div class="event-name">Boys 4x100 Meter Relay</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 3 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">12:45 PM</span>
+          <span class="event-badge">#111</span>
+        </div>
+        <div class="event-name">Girls 400 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Morgan, Alyha</span><span class="section-badge">Sec 1 of 5</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">12:45 PM</span>
+          <span class="event-badge">#112</span>
+        </div>
+        <div class="event-name">Boys 400 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Heussner, Brody</span><span class="section-badge">Sec 3 of 5</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">1:35 PM</span>
+          <span class="event-badge">#113</span>
+        </div>
+        <div class="event-name">Girls 300 Meter Hurdles</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Rappaport, Meghan</span><span class="section-badge">Sec 1 of 4</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">1:35 PM</span>
+          <span class="event-badge">#114</span>
+        </div>
+        <div class="event-name">Boys 300 Meter Hurdles</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Fortier, Gavin</span><span class="section-badge">Sec 1 of 4</span></div>
+<div class="athlete-row"><span class="athlete-name">Lueck, Colton</span><span class="section-badge">Sec 3 of 4</span></div>
+<div class="athlete-row"><span class="athlete-name">Breinholt, Spencer</span><span class="section-badge">Sec 4 of 4</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">2:35 PM</span>
+          <span class="event-badge">#117</span>
+        </div>
+        <div class="event-name">Girls 200 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Lowe, Addyson</span><span class="section-badge">Sec 2 of 5</span></div>
+<div class="athlete-row"><span class="athlete-name">Morgan, Alyha</span><span class="section-badge">Sec 3 of 5</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">2:35 PM</span>
+          <span class="event-badge">#118</span>
+        </div>
+        <div class="event-name">Boys 200 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Menden, Maxwell Max</span><span class="section-badge">Sec 2 of 5</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card seeded">
+        <div class="card-header">
+          <span class="event-time">3:05 PM</span>
+          <span class="event-badge">#121</span>
+        </div>
+        <div class="event-name">Girls 4x400 Meter Relay</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 2 of 3</span></div>
+        </div>
+      </div>
+  <div class="session-header elite" data-session="elite">Saturday Elite Session - March 21</div>
+  
+      <div data-category="field" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">9:00 AM</span>
+          <span class="event-badge">#238</span>
+        </div>
+        <div class="event-name">Boys Javelin Throw</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Palmer, Brennen</span><span class="section-badge">Flt 2 of 5</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">~1:00 PM</span>
+          <span class="event-badge">#237</span>
+        </div>
+        <div class="event-name">Girls Javelin Throw</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Witcher, Ela</span><span class="section-badge">Flt 2 of 4</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">3:00 PM</span>
+          <span class="event-badge">#225</span>
+        </div>
+        <div class="event-name">Girls Pole Vault</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Bland, Maibri</span><span class="section-badge">Flt 1 of 1</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">3:00 PM</span>
+          <span class="event-badge">#232</span>
+        </div>
+        <div class="event-name">Boys Discus Throw</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Reedy, Trenten</span><span class="section-badge">Flt 1 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">3:15 PM</span>
+          <span class="event-badge">#229</span>
+        </div>
+        <div class="event-name">Girls Triple Jump</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Brower, Janie</span><span class="section-badge">Flt 1 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">5:00 PM</span>
+          <span class="event-badge">#203</span>
+        </div>
+        <div class="event-name">Girls 100 Meter Hurdles</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Hester, Kate</span><span class="section-badge">Sec 3 of 4</span></div>
+<div class="athlete-row"><span class="athlete-name">McEuen, Brenli</span><span class="section-badge">Sec 3 of 4</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">5:00 PM</span>
+          <span class="event-badge">#231</span>
+        </div>
+        <div class="event-name">Girls Discus Throw</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Vea, Lolena</span><span class="section-badge">Flt 3 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">5:30 PM</span>
+          <span class="event-badge">#206</span>
+        </div>
+        <div class="event-name">Boys 100 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Heussner, Brody</span><span class="section-badge">Sec 4 of 4</span></div>
+        </div>
+      </div>
+      <div data-category="field" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">6:00 PM</span>
+          <span class="event-badge">#223</span>
+        </div>
+        <div class="event-name">Girls High Jump</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Brower, Janie</span><span class="section-badge">Flt 1 of 1</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">6:20 PM</span>
+          <span class="event-badge">#207</span>
+        </div>
+        <div class="event-name">Girls 1600 Meter Run</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Bonnette, Ella</span><span class="section-badge">Sec 2 of 2</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">6:50 PM</span>
+          <span class="event-badge">#210</span>
+        </div>
+        <div class="event-name">Boys 4x100 Meter Relay</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="relay-name">Highland A (Relay)</span><span class="section-badge">Sec 2 of 2</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">7:35 PM</span>
+          <span class="event-badge">#213</span>
+        </div>
+        <div class="event-name">Girls 300 Meter Hurdles</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Hester, Kate</span><span class="section-badge">Sec 1 of 3</span></div>
+<div class="athlete-row"><span class="athlete-name">Anderson, Katelyn</span><span class="section-badge">Sec 2 of 3</span></div>
+<div class="athlete-row"><span class="athlete-name">Delancey, Camryn</span><span class="section-badge">Sec 3 of 3</span></div>
+<div class="athlete-row"><span class="athlete-name">Hurtado, Ariana</span><span class="section-badge">Sec 3 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">8:00 PM</span>
+          <span class="event-badge">#216</span>
+        </div>
+        <div class="event-name">Boys 800 Meter Run</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">McLauchlin, Brayden</span><span class="section-badge">Sec 1 of 3</span></div>
+<div class="athlete-row"><span class="athlete-name">Zlotoff, Phineas</span><span class="section-badge">Sec 1 of 3</span></div>
+<div class="athlete-row"><span class="athlete-name">Delancey, Brandon</span><span class="section-badge">Sec 3 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="sprints" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">8:30 PM</span>
+          <span class="event-badge">#218</span>
+        </div>
+        <div class="event-name">Boys 200 Meter Dash</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Heussner, Brody</span><span class="section-badge">Sec 2 of 3</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">8:50 PM</span>
+          <span class="event-badge">#219</span>
+        </div>
+        <div class="event-name">Girls 3200 Meter Run</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Huempfner, Audra</span><span class="section-badge">Sec 1 of 1</span></div>
+<div class="athlete-row"><span class="athlete-name">Morris, Natalia</span><span class="section-badge">Sec 1 of 1</span></div>
+        </div>
+      </div>
+      <div data-category="distance" class="event-card elite">
+        <div class="card-header">
+          <span class="event-time">8:50 PM</span>
+          <span class="event-badge">#220</span>
+        </div>
+        <div class="event-name">Boys 3200 Meter Run</div>
+        <div class="athletes-list">
+          <div class="athlete-row"><span class="athlete-name">Zlotoff, Phineas</span><span class="section-badge">Sec 1 of 2</span></div>
+<div class="athlete-row"><span class="athlete-name">Delancey, Brandon</span><span class="section-badge">Sec 2 of 2</span></div>
+        </div>
+      </div>
+</div>
+
+<div class="no-results" id="noResults">No matching events found.</div>
+
+<div class="footer">
+  Times are approximate &mdash; races run consecutively.<br>
+  Field events may overlap with track events.
+</div>
+
+<script>
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  });
+});
+
+// Search
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+function applyFilters() {
+  const filter = document.querySelector('.filter-btn.active').dataset.filter;
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const cards = document.querySelectorAll('.event-card');
+  const headers = document.querySelectorAll('.session-header');
+  let visibleCount = 0;
+  let visibleSessions = new Set();
+
+  cards.forEach(card => {
+    const session = [...card.classList].find(c => ['friday','seeded','elite'].includes(c));
+    const category = card.dataset.category;
+    const text = card.textContent.toLowerCase();
+    const matchFilter = filter === 'all' || category === filter;
+    const matchSearch = !search || text.includes(search);
+    const show = matchFilter && matchSearch;
+    card.style.display = show ? '' : 'none';
+    if (show) {
+      visibleCount++;
+      visibleSessions.add(session);
+    }
+  });
+
+  headers.forEach(h => {
+    const session = h.dataset.session;
+    h.style.display = visibleSessions.has(session) ? '' : 'none';
+  });
+
+  document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+// --- Time-based highlighting ---
+// Meet dates: Friday March 20 2026, Saturday March 21 2026
+// Parse event time + session into a real Date
+function parseEventDate(card) {
+  const timeText = card.querySelector('.event-time').textContent.trim().replace('~','');
+  const isFriday = card.classList.contains('friday');
+  // Friday = March 20, Saturday = March 21
+  const dateStr = isFriday ? '2026-03-20' : '2026-03-21';
+  const match = timeText.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (!match) return null;
+  let hour = parseInt(match[1]);
+  const min = parseInt(match[2]);
+  const ampm = match[3].toUpperCase();
+  if (ampm === 'PM' && hour !== 12) hour += 12;
+  if (ampm === 'AM' && hour === 12) hour = 0;
+  return new Date(`${dateStr}T${String(hour).padStart(2,'0')}:${String(min).padStart(2,'0')}:00`);
+}
+
+function updateTimeHighlights() {
+  const now = new Date();
+  const cards = document.querySelectorAll('.event-card');
+
+  // Build list of {card, date} sorted by date
+  const timed = [];
+  cards.forEach(card => {
+    card.classList.remove('past', 'current');
+    const d = parseEventDate(card);
+    if (d) timed.push({ card, date: d });
+  });
+  timed.sort((a, b) => a.date - b.date);
+
+  // Find the first event that hasn't started yet (or started within last 30 min)
+  let currentIdx = -1;
+  for (let i = 0; i < timed.length; i++) {
+    const diff = timed[i].date - now;
+    // Event is "current" if it starts within -30min to +60min of now
+    if (diff >= -30 * 60 * 1000) {
+      currentIdx = i;
+      break;
+    }
+  }
+
+  // Mark past events
+  for (let i = 0; i < timed.length; i++) {
+    if (currentIdx === -1) {
+      // All events are in the past (meet is over) or future (hasn't started)
+      if (timed[i].date < now) timed[i].card.classList.add('past');
+    } else if (i < currentIdx) {
+      timed[i].card.classList.add('past');
+    }
+  }
+
+  // Mark current/next event(s) - highlight all cards at the same time slot
+  if (currentIdx >= 0) {
+    const currentTime = timed[currentIdx].date.getTime();
+    for (let i = currentIdx; i < timed.length; i++) {
+      if (timed[i].date.getTime() === currentTime) {
+        timed[i].card.classList.add('current');
+      } else {
+        break;
+      }
+    }
+  }
+}
+
+// Run on load and every 60 seconds
+updateTimeHighlights();
+setInterval(updateTimeHighlights, 60000);
+</script>
+</body>
+</html>
